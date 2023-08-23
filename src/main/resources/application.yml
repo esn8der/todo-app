@@ -1,11 +1,13 @@
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/todoapp?useSSL=false&serverTimezone=UTC
-    username: tu_usuario
-    password: tu_contraseña
-    driver-class-name: com.mysql.cj.jdbc.Driver
+# Server properties
+server:
+  servlet:
+    context-path: /todo-api
+  port: 8080
 
-  jpa:
-    hibernate:
-      ddl-auto: update # Puedes usar update si quieres que Hibernate actualice automáticamente la base de datos
-    show-sql: true
+# Spring properties
+spring:
+  # Dev is active by default. This value can be overwritten by java arg param
+  profiles:
+    active: dev
+  application:
+    name: todo-api

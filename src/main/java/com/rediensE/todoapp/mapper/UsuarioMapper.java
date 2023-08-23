@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 public class UsuarioMapper {
     private final ModelMapper modelMapper;
 
-    public UsuarioMapper(ModelMapper modelmapper) {
-        this.modelMapper = modelmapper;
+    public UsuarioMapper() {
+        this.modelMapper = new ModelMapper();
         configureMappings();
     }
 

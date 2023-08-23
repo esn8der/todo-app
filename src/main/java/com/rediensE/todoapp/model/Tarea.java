@@ -1,14 +1,13 @@
 package com.rediense.todoapp.model;
 
+import com.rediense.todoapp.utils.EstadoTarea;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Table(name = "tarea")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public class Tarea {
 
     @Id
@@ -25,7 +24,8 @@ public class Tarea {
     private boolean favorito;
 
     @Column()
-    private String estado;
+    @Enumerated(EnumType.STRING) // Indica que estás utilizando un Enum
+    private EstadoTarea estado; // Cambiado a usar el Enum EstadoTarea
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
