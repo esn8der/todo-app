@@ -43,14 +43,12 @@ public class UsuarioService {
 
         if (users.isEmpty()){
             log.info("Lista de usuarios vacía");
-            throw new DataNotFoundException("No hay usuarios creados");
-        } else {
-            List<UsuarioDTO> usersDTO = new ArrayList<>();
-            for (Usuario user : users) {
-                usersDTO.add(usuarioMapper.toUsuarioDTO(user));
-            }
-            return usersDTO;
+            return new ArrayList<>();
         }
+
+        return users.stream()
+                .map(usuarioMapper::toUsuarioDTO)
+                .toList();
     }
 
 

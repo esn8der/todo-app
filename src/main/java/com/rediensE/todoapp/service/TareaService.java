@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,19 +23,6 @@ public class TareaService {
     public TareaService(TareaRepository tareaRepository, TareaMapper tareaMapper) {
         this.tareaRepository = tareaRepository;
         this.tareaMapper = tareaMapper;
-    }
-
-    public TareaDTO getTarea(Long id){
-        Optional<Tarea> optionalTarea = tareaRepository.findById(id);
-
-        if(optionalTarea.isEmpty()){
-            log.info("No existe la tarea de id: {}", id);
-            throw new DataNotFoundException("La tarea no existe");
-        } else {
-            Tarea tarea = optionalTarea.get();
-            return tareaMapper.toTareaDTO(tarea);
-
-        }
     }
 
     private void validateTareaDTO(TareaDTO tareaDTO) {
@@ -50,6 +39,32 @@ public class TareaService {
         Tarea tarea = tareaMapper.toTarea(tareaDTO);
         tarea = tareaRepository.save(tarea);
         return tareaMapper.toTareaDTO(tarea);
+    }
+
+    public TareaDTO getTarea(Long id){
+        Optional<Tarea> optionalTarea = tareaRepository.findById(id);
+
+        if(optionalTarea.isEmpty()){
+            log.info("No existe la tarea de id: {}", id);
+            throw new DataNotFoundException("La tarea no existe");
+        } else {
+            Tarea tarea = optionalTarea.get();
+            return tareaMapper.toTareaDTO(tarea);
+
+        }
+    }
+
+    public List<TareaDTO> getTareas(){
+        List<Tarea> tareaList = tareaRepository.findAll();
+
+        if(tareaList.isEmpty()){
+            log.info("Lista de tareas vacía");
+            return new ArrayList<>();
+        }
+
+        return tareaList.stream()
+                .map(tareaMapper::toTareaDTO)
+                .toList();
     }
 
     public void deleteTarea(Long id){

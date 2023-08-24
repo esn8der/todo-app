@@ -1,7 +1,6 @@
 package com.rediense.todoapp.controller;
 
 import com.rediense.todoapp.dto.TareaDTO;
-import com.rediense.todoapp.model.Tarea;
 import com.rediense.todoapp.service.TareaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/v1/tareas")
@@ -32,15 +32,16 @@ public class TareaController {
             summary = "Agregar una tarea nueva",
             description = "Se agrega una tarea nueva al usuario correspondiente",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Petición exitosa"),
-                    @ApiResponse(responseCode = "201", description = "Tarea creada")
+                    @ApiResponse(responseCode = "201", description = "Tarea creada",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class))),
+                    @ApiResponse(responseCode = "400", description = "Solicitud inválida",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class)))
             }
     )
     @PostMapping("/create")
     public ResponseEntity<TareaDTO> createTarea(@RequestBody TareaDTO tareaDTO) throws URISyntaxException {
         log.info("Request POST /v1/tareas/create - Agregando tarea de titulo: {}", tareaDTO.getTitulo());
         TareaDTO newTareaDTO = tareaService.saveTarea(tareaDTO);
-        //return ResponseEntity.ok(newTareaDTO);
         return ResponseEntity.created(new URI("/v1/tareas/" + newTareaDTO.getId())).body(newTareaDTO);
     }
 
@@ -48,7 +49,12 @@ public class TareaController {
             summary = "Actualizar una tarea",
             description = "Se actualiza una tarea por su id",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Petición exitosa")
+                    @ApiResponse(responseCode = "200", description = "Tarea actualizada exitosamente",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class))),
+                    @ApiResponse(responseCode = "400", description = "Solicitud inválida",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Tarea no encontrada",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class)))
             }
     )
     @PutMapping("/update")
@@ -63,21 +69,25 @@ public class TareaController {
             description = "Eliminar objeto tarea por id pasado como argumento",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Tarea eliminada con éxito"),
+                    @ApiResponse(responseCode = "404", description = "Tarea no encontrada",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class)))
             }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Tarea> deleteTarea(@PathVariable Long id){
+    public ResponseEntity<Void> deleteTarea(@PathVariable Long id){
         log.info("Request DELETE /v1/tareas/{} - Eliminando tarea por id", id);
         tareaService.deleteTarea(id);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(
-            summary = "Regresa tarea por id.",
+            summary = "Regresa tarea por id",
             description = "Obtiene un objeto Tarea por un id especifico. La respuesta es un objeto Tarea.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Petición exitosa"),
-                    @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) })
+                    @ApiResponse(responseCode = "200", description = "Petición exitosa",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Tarea no encontrada",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class)))
             }
     )
     @GetMapping("{id}")
@@ -87,4 +97,18 @@ public class TareaController {
         return ResponseEntity.ok(tareaDTO);
     }
 
+    @Operation(
+            summary = "Obtener todas las tareas",
+            description = "Obtiene una lista de todas las tareas existentes",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Petición exitosa",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class)))
+            }
+    )
+    @GetMapping("")
+    public ResponseEntity<List<TareaDTO>> getTareas(){
+        log.info("Request GET /v1/tareas/ - Buscando todas las tareas");
+        List<TareaDTO> tareaDTOList = tareaService.getTareas();
+        return ResponseEntity.ok(tareaDTOList);
+    }
 }
