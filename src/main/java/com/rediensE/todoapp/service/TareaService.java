@@ -76,4 +76,12 @@ public class TareaService {
             tareaRepository.deleteById(id);
         }
     }
+
+    public List<TareaDTO> searchTareasByTitulo(String term){
+        List<Tarea> tareaList = tareaRepository.findAllByTituloContainingIgnoreCase(term);
+
+        return tareaList.stream()
+                .map(tareaMapper::toTareaDTO)
+                .toList();
+    }
 }

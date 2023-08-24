@@ -103,12 +103,29 @@ public class TareaController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Petición exitosa",
                             content = @Content(schema = @Schema(implementation = TareaDTO.class)))
-            }
+            },
+            operationId = "getAllTareas"
     )
     @GetMapping("")
     public ResponseEntity<List<TareaDTO>> getTareas(){
         log.info("Request GET /v1/tareas/ - Buscando todas las tareas");
         List<TareaDTO> tareaDTOList = tareaService.getTareas();
+        return ResponseEntity.ok(tareaDTOList);
+    }
+
+    @Operation(
+            summary = "Busca tareas por un termino",
+            description = "Obtiene una lista de todas las tareas que coinciden en su titulo con el termino pasado por argumento",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Petición exitosa",
+                            content = @Content(schema = @Schema(implementation = TareaDTO.class)))
+            },
+            operationId = "searchTareaByTitulo"
+    )
+    @GetMapping("search")
+        public ResponseEntity<List<TareaDTO>> searchTareaByTitulo(@RequestParam("titulo") String term){
+        log.info("Request GET /v1/tareas - Buscando tareas que coincidan con el término '{}'", term);
+        List<TareaDTO> tareaDTOList = tareaService.searchTareasByTitulo(term);
         return ResponseEntity.ok(tareaDTOList);
     }
 }
