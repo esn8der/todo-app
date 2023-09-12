@@ -1,16 +1,14 @@
 package com.rediense.todoapp.controller;
 
 import com.rediense.todoapp.dto.UsuarioDTO;
+import com.rediense.todoapp.exception.RegistrationException;
 import com.rediense.todoapp.model.Usuario;
 import com.rediense.todoapp.service.UsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,5 +60,25 @@ public class UsuarioController {
         log.info("Request GET /v1/usuarios - Buscando todos los usuarios");
         List<UsuarioDTO> usuarioDTOS = usuarioService.getUsuarios();
         return ResponseEntity.ok(usuarioDTOS);
+    }
+
+    @Operation(
+            summary = "Registrar un usuario.",
+            description = "Registra un objeto usuario en la base de dato siempre que cumpla con los requisitos",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Usuario registrado con éxito."),
+                    @ApiResponse(responseCode = "400", description = "Solicitud incorrecta debido a datos inválidos o faltantes."),
+                    @ApiResponse(responseCode = "409", description = "Conflicto: El usuario ya existe."),
+                    @ApiResponse(responseCode = "500", description = "Error interno del servidor.")
+            }
+    )
+    @PostMapping("/registrar")
+    public ResponseEntity<UsuarioDTO> registrarUsuario(@RequestParam String name, @RequestParam String pass){
+        try{
+            UsuarioDTO registeredUser = usuarioService.registrarUsuario(name, pass);
+            return ResponseEntity.ok(registeredUser);
+        } catch (RegistrationException e){
+            return ResponseEntity.badRequest().body(new UsuarioDTO());
+        }
     }
 }
